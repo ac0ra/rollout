@@ -1,0 +1,46 @@
+Rollout
+
+Automated backup / deployment tool.
+- backup guest to tar / image / snapshot (selectable, also auto mode).
+- convert backup to different types.
+- convert backup to stage4 (automated cleanup with plugins and scripts).
+- deployment tools (deployment agent, iso, kernel/initramfs or standalone).
+- stage4diff (execute scripts within chroot or deployed form to fork a stage4, store file differences or whole forked tar).
+
+
+---- Backup process.
+-- Detect host state, start collecting metadata.
+-- connect to destination to collect backup rules (if desired).
+-- create file list / index.
+-- run pre-backup scripts.
+-- verify index and create diff post scripts.
+-- setup connection to destination (if not already for pre-config, destination end may be local or remote via socket, udp/tcp or zmq).
+-- backup partition table and bootloaders.
+-- backup boot partition.
+-- backup root partition.
+-- backup other partitions (basic rules exclude swap and other not really backup appropriate partitions; instead their partitions are stored as tag to re-create them).
+-- verify index and create diff post backups to detect any changes.
+-- send perf data to destination and either wait for destination, or hangup.
+
+
+----- Conversion Process.
+-- read metadata, determine os image type.
+-- create temporary dirs.
+-- mount image / extract tar.
+-- index, verify against stored index.
+-- create destination container and mirror meta data onto any appropriate settings.
+-- copy file system to destination preserving contents (file by file).
+-- verify index, store diff.
+--IF- for stage4 conversion also perform cleanup scripts on destination inside chroot before tar creation.
+
+
+
+
+---- Stage4 diff.
+-- compare two stage4 tars (compare tar to index, index to index, or tar to tar).
+-- create tar.patch.
+
+
+--- stage4 fork.
+-- create forks of stage4, appyling customizations via scripts and plugins to an agent executed during the operation  (either via a chroot, or via an automated deployment system of sorts).
+-- Then uses stage4 diff to create a tar patch, or can be used on its own to create automated forks of a stage4.
